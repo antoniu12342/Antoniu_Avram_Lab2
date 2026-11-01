@@ -1,7 +1,22 @@
+global using Antoniu_Avram_Lab2.Data;
+using Antoniu_Avram_Lab2.Models;
 using Microsoft.EntityFrameworkCore;
 
-public class Antoniu_Avram_Lab2Context(DbContextOptions<Antoniu_Avram_Lab2Context> options) : DbContext(options)
+
+namespace Antoniu_Avram_Lab2.Data
 {
-    public DbSet<Antoniu_Avram_Lab2.Models.Book> Book { get; set; } = default!;
-    public object Publisher { get; internal set; }
+    public class Antoniu_Avram_Lab2Context : DbContext
+    {
+        public DbSet<Category> Category { get; set; } = default!;
+        public Antoniu_Avram_Lab2Context(DbContextOptions<Antoniu_Avram_Lab2Context> options)
+            : base(options)
+        {
+        }
+
+        public DbSet<Book> Book { get; set; } = default!;
+
+        // Aici este locul lui:
+        public DbSet<Publisher> Publisher { get; set; } = default!;
+        
+    }
 }
