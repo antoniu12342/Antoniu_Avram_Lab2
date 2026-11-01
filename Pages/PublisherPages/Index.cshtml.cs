@@ -1,28 +1,42 @@
-using Microsoft.AspNetCore.Mvc;
+using Antoniu_Avram_Lab2.Data;
+using Antoniu_Avram_Lab2.Models;
+using Antoniu_Avram_Lab2.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Antoniu_Avram_Lab2.Models;
 
-namespace Antoniu_Avram_Lab2.Pages.PublisherPages;
-
-public class IndexModel : PageModel
+namespace Antoniu_Avram_Lab2.Pages.PublisherPages
 {
-    private readonly Antoniu_Avram_Lab2.Data.Antoniu_Avram_Lab2Context _context;
-
-    public IndexModel(Antoniu_Avram_Lab2.Data.Antoniu_Avram_Lab2Context context)
+    public class IndexModel : PageModel
     {
-        _context = context;
-    }
+        private readonly Antoniu_Avram_Lab2Context _context;
 
-    // 1. Aici trebuie IList, NU DbSet (și o singură dată!)
-    public IList<Publisher> Publisher { get; set; } = default!;
-
-    public async Task OnGetAsync()
-    {
-        // 2. Extragem lista din context
-        if (_context.Publisher != null)
+        public IndexModel(Antoniu_Avram_Lab2Context context)
         {
-            Publisher = await _context.Publisher.ToListAsync();
+            _context = context;
         }
-    } // <--- Acolada care lipsea la linia 21-22 și închide metoda OnGetAsync
-} // <--- Acolada care închide clasa IndexModel} // <--- Acolada care închide namespace-ul
+
+        public IList<Publisher> Publisher { get; set; } = default!;
+        public PublisherIndexData PublisherData { get; set; }
+        public int PublisherID { get; set; }
+        public int BookID { get; set; }
+
+        public async Task OnGetAsync(int? id, int? bookID)
+        {
+            PublisherData = new PublisherIndexData();
+            PublisherData.Publishers = await _context.Publisher
+                .Include(i => i.Books)
+                
+                // .ThenInclude(c => c.Author)
+                .OrderBy(i => i.PublisherName)
+                .ToListAsync();
+
+            if (id != null)
+            {
+                PublisherID = id.Value;
+                Publisher publisher = PublisherData.Publishers
+                    .Where(i => i.ID == id.Value).Single();
+                PublisherData.Books = publisher.Books;
+            }
+        }
+    }
+}
